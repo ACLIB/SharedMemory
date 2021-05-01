@@ -3,11 +3,7 @@
 namespace ACLIB
 {
     EventLoop::EventLoop()
-        : m_thread_id(0)
-        , m_thread_handle(nullptr)
-        , m_running(true)
-        , m_timeout_ms(1)
-        , m_physics(AC::PHYSICS_PAGE)
+        : m_physics(AC::PHYSICS_PAGE)
         , m_graphics(AC::GRAPHICS_PAGE)
         , m_statics(AC::STATICS_PAGE)
         , m_physics_compare()
@@ -22,29 +18,29 @@ namespace ACLIB
         // Physics
         if(m_physics->gear != m_physics_compare.gear)
         {
-            m_events.push(GEAR_CHANGED);
+            m_events.emplace(GEAR_CHANGED);
         }
 
         // Graphics
         if(m_graphics->status != m_graphics_compare.status)
         {
-            m_events.emplace(static_cast<Uint32>(STATUS_CHANGED));
+            m_events.emplace(STATUS_CHANGED);
         }
         if(m_graphics->session != m_graphics_compare.session)
         {
-            m_events.emplace(static_cast<Uint32>(SESSION_CHANGED));
+            m_events.emplace(SESSION_CHANGED);
         }
         if(m_graphics->completedLaps != m_graphics_compare.completedLaps)
         {
-            m_events.emplace(static_cast<Uint32>(COMPLETED_LAPS_CHANGED));
+            m_events.emplace(COMPLETED_LAPS_CHANGED);
         }
         if(m_graphics->position != m_graphics_compare.position)
         {
-            m_events.emplace(static_cast<Uint32>(POSITION_CHANGED));
+            m_events.emplace(POSITION_CHANGED);
         }
         if(m_graphics->isInPit != m_graphics_compare.isInPit)
         {
-            m_events.emplace(static_cast<Uint32>(IS_IN_PIT));
+            m_events.emplace(IS_IN_PIT);
         }
     }
 
@@ -75,16 +71,11 @@ namespace ACLIB
         m_events.pop();
     }
 
-    void EventLoop::start()
+    void EventLoop::push(EventType event)
     {
-        m_thread_handle = CreateThread(nullptr, 0, &startThread, this, 0, &m_thread_id);
-
-        if(m_thread_handle == nullptr)
-        {
-            // err
-            printf("Could not create thread\n");
-        }
+        m_events.push(event);
     }
+
     void EventLoop::run()
     {
         refreshCompare();
@@ -95,21 +86,5 @@ namespace ACLIB
             refreshCompare();
             Sleep(m_timeout_ms);
         }
-    }
-
-    void EventLoop::stop()
-    {
-        m_running = false;
-    }
-
-    DWORD startThread(LPVOID p)
-    {
-        if(p == nullptr)
-        {
-            printf("Thread parameter is nullptr.\n");
-            return -1;
-        }
-        reinterpret_cast<EventLoop*>(p)->run();
-        return 0;
     }
 }  // namespace ACLIB

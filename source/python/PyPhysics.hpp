@@ -10,7 +10,7 @@ namespace ACLIB
 {
     struct PyPhysics
     {
-        PyObject_HEAD SharedMemory<AC::Physics> m_physics;
+        PyObject_HEAD SharedMemory<AC::Physics>* m_physics;
     };
 
     static PyObject* physics_new_(PyTypeObject* type, PyObject* args, PyObject* kwds);

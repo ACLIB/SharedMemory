@@ -3,8 +3,6 @@
 #include "PyPhysics.hpp"
 #include "PyStatics.hpp"
 
-std::fstream Log::stream = std::fstream("C:\\Users\\Chris\\Desktop\\f.log", std::ios::out);
-
 namespace ACLIB
 {
     static PyObject *test(PyObject *self, PyObject *args)

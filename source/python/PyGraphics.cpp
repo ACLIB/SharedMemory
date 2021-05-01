@@ -11,13 +11,14 @@ namespace ACLIB
 
         if(self != nullptr)
         {
-            self->m_graphics = SharedMemory<AC::Graphics>(AC::GRAPHICS_PAGE);
+            self->m_graphics = new SharedMemory<AC::Graphics>(AC::GRAPHICS_PAGE);
         }
         return reinterpret_cast<PyObject*>(self);
     }
 
     void graphics_del_(PyTypeObject* self)
     {
+        delete reinterpret_cast<PyGraphics*>(self)->m_graphics;
         self->tp_free(self);
     }
 
@@ -27,132 +28,138 @@ namespace ACLIB
 
     static PyObject* get_packetId(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(self->m_graphics->packetId);
+        return PyLong_FromLong(self->m_graphics->data()->packetId);
     }
 
     static PyObject* get_status(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(static_cast<AC::Uint32>(self->m_graphics->status));
+        return PyLong_FromLong(static_cast<AC::Uint32>(self->m_graphics->data()->status));
     }
     static PyObject* get_session(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(static_cast<AC::Uint32>(self->m_graphics->session));
+        return PyLong_FromLong(static_cast<AC::Uint32>(self->m_graphics->data()->session));
     }
     static PyObject* get_currentTime(PyGraphics* self, void* closure)
     {
         return PyUnicode_FromWideChar(
-            self->m_graphics->currentTime,
-            wcslen(self->m_graphics->currentTime));
+            self->m_graphics->data()->currentTime,
+            wcslen(self->m_graphics->data()->currentTime));
     }
     static PyObject* get_lastTime(PyGraphics* self, void* closure)
     {
-        return PyUnicode_FromWideChar(self->m_graphics->lastTime, wcslen(self->m_graphics->lastTime));
+        return PyUnicode_FromWideChar(
+            self->m_graphics->data()->lastTime,
+            wcslen(self->m_graphics->data()->lastTime));
     }
     static PyObject* get_bestTime(PyGraphics* self, void* closure)
     {
-        return PyUnicode_FromWideChar(self->m_graphics->bestTime, wcslen(self->m_graphics->bestTime));
+        return PyUnicode_FromWideChar(
+            self->m_graphics->data()->bestTime,
+            wcslen(self->m_graphics->data()->bestTime));
     }
     static PyObject* get_split(PyGraphics* self, void* closure)
     {
-        return PyUnicode_FromWideChar(self->m_graphics->split, wcslen(self->m_graphics->split));
+        return PyUnicode_FromWideChar(
+            self->m_graphics->data()->split,
+            wcslen(self->m_graphics->data()->split));
     }
     static PyObject* get_completedLaps(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(self->m_graphics->completedLaps);
+        return PyLong_FromLong(self->m_graphics->data()->completedLaps);
     }
     static PyObject* get_position(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(self->m_graphics->position);
+        return PyLong_FromLong(self->m_graphics->data()->position);
     }
     static PyObject* get_iCurrentTime(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(self->m_graphics->iCurrentTime);
+        return PyLong_FromLong(self->m_graphics->data()->iCurrentTime);
     }
     static PyObject* get_iLastTime(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(self->m_graphics->iLastTime);
+        return PyLong_FromLong(self->m_graphics->data()->iLastTime);
     }
     static PyObject* get_iBestTime(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(self->m_graphics->iBestTime);
+        return PyLong_FromLong(self->m_graphics->data()->iBestTime);
     }
     static PyObject* get_sessionTimeLeft(PyGraphics* self, void* closure)
     {
-        return PyFloat_FromDouble(self->m_graphics->sessionTimeLeft);
+        return PyFloat_FromDouble(self->m_graphics->data()->sessionTimeLeft);
     }
     static PyObject* get_distanceTraveled(PyGraphics* self, void* closure)
     {
-        return PyFloat_FromDouble(self->m_graphics->distanceTraveled);
+        return PyFloat_FromDouble(self->m_graphics->data()->distanceTraveled);
     }
     static PyObject* get_isInPit(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(self->m_graphics->isInPit);
+        return PyLong_FromLong(self->m_graphics->data()->isInPit);
     }
     static PyObject* get_currentSectorIndex(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(self->m_graphics->currentSectorIndex);
+        return PyLong_FromLong(self->m_graphics->data()->currentSectorIndex);
     }
     static PyObject* get_lastSectorTime(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(self->m_graphics->lastSectorTime);
+        return PyLong_FromLong(self->m_graphics->data()->lastSectorTime);
     }
     static PyObject* get_numberOfLaps(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(self->m_graphics->numberOfLaps);
+        return PyLong_FromLong(self->m_graphics->data()->numberOfLaps);
     }
     static PyObject* get_tyreCompound(PyGraphics* self, void* closure)
     {
         return PyUnicode_FromWideChar(
-            self->m_graphics->tyreCompound,
-            wcslen(self->m_graphics->tyreCompound));
+            self->m_graphics->data()->tyreCompound,
+            wcslen(self->m_graphics->data()->tyreCompound));
     }
     static PyObject* get_replayTimeMultiplier(PyGraphics* self, void* closure)
     {
-        return PyFloat_FromDouble(self->m_graphics->replayTimeMultiplier);
+        return PyFloat_FromDouble(self->m_graphics->data()->replayTimeMultiplier);
     }
     static PyObject* get_normalizedCarPosition(PyGraphics* self, void* closure)
     {
-        return PyFloat_FromDouble(self->m_graphics->normalizedCarPosition);
+        return PyFloat_FromDouble(self->m_graphics->data()->normalizedCarPosition);
     }
     static PyObject* get_carCoordinates(PyGraphics* self, void* closure)
     {
         return Py_BuildValue(
             "[fff]",
-            self->m_graphics->carCoordinates[0],
-            self->m_graphics->carCoordinates[1],
-            self->m_graphics->carCoordinates[2]);
+            self->m_graphics->data()->carCoordinates[0],
+            self->m_graphics->data()->carCoordinates[1],
+            self->m_graphics->data()->carCoordinates[2]);
     }
     static PyObject* get_penaltyTime(PyGraphics* self, void* closure)
     {
-        return PyFloat_FromDouble(self->m_graphics->penaltyTime);
+        return PyFloat_FromDouble(self->m_graphics->data()->penaltyTime);
     }
     static PyObject* get_flag(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(self->m_graphics->flag);
+        return PyLong_FromLong(self->m_graphics->data()->flag);
     }
     static PyObject* get_idealLineOn(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(self->m_graphics->idealLineOn);
+        return PyLong_FromLong(self->m_graphics->data()->idealLineOn);
     }
     static PyObject* get_isInPitLine(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(self->m_graphics->isInPitLine);
+        return PyLong_FromLong(self->m_graphics->data()->isInPitLine);
     }
     static PyObject* get_surfaceGrip(PyGraphics* self, void* closure)
     {
-        return PyFloat_FromDouble(self->m_graphics->surfaceGrip);
+        return PyFloat_FromDouble(self->m_graphics->data()->surfaceGrip);
     }
     static PyObject* get_mandatoryPitDone(PyGraphics* self, void* closure)
     {
-        return PyLong_FromLong(self->m_graphics->mandatoryPitDone);
+        return PyLong_FromLong(self->m_graphics->data()->mandatoryPitDone);
     }
     static PyObject* get_windSpeed(PyGraphics* self, void* closure)
     {
-        return PyFloat_FromDouble(self->m_graphics->windSpeed);
+        return PyFloat_FromDouble(self->m_graphics->data()->windSpeed);
     }
     static PyObject* get_windDirection(PyGraphics* self, void* closure)
     {
-        return PyFloat_FromDouble(self->m_graphics->windDirection);
+        return PyFloat_FromDouble(self->m_graphics->data()->windDirection);
     }
 
     static PyGetSetDef GraphicsType_getset[] = {
@@ -189,42 +196,42 @@ namespace ACLIB
         {nullptr}};
 
     PyTypeObject GraphicsType = {
-        PyVarObject_HEAD_INIT(&PyType_Type, 0) "aclib_shared_memory.Graphics", /* tp_name */
-        sizeof(PyGraphics),                                             /* tp_basicsize */
-        0,                                                              /* tp_itemsize */
-        nullptr,                                                        /* tp_dealloc */
-        0,                                                              /* tp_print */
-        nullptr,                                                        /* tp_getattr */
-        nullptr,                                                        /* tp_setattr */
-        nullptr,                                                        /* tp_reserved */
-        nullptr,                                                        /* tp_repr */
-        nullptr,                                                        /* tp_as_number */
-        nullptr,                                                        /* tp_as_sequence */
-        nullptr,                                                        /* tp_as_mapping */
-        nullptr,                                                        /* tp_hash */
-        nullptr,                                                        /* tp_call */
-        nullptr,                                                        /* tp_str */
-        nullptr,                                                        /* tp_getattro */
-        nullptr,                                                        /* tp_setattro */
-        nullptr,                                                        /* tp_as_buffer */
-        Py_TPFLAGS_DEFAULT,                                             /* tp_flags */
-        nullptr,                                                        /* tp_doc */
-        nullptr,                                                        /* tp_traverse */
-        nullptr,                                                        /* tp_clear */
-        nullptr,                                                        /* tp_richcompare */
-        0,                                                              /* tp_weaklistoffset */
-        nullptr,                                                        /* tp_iter */
-        nullptr,                                                        /* tp_iternext */
-        GraphicsType_methods,                                           /* tp_methods */
-        GraphicsType_members,                                           /* tp_members */
-        GraphicsType_getset,                                            /* tp_getset */
-        nullptr,                                                        /* tp_base */
-        nullptr,                                                        /* tp_dict */
-        nullptr,                                                        /* tp_descr_get */
-        nullptr,                                                        /* tp_descr_set */
-        0,                                                              /* tp_dictoffset */
-        nullptr,                                                        /* tp_init */
-        nullptr,                                                        /* tp_alloc */
-        (newfunc)graphics_new_,                                         /* tp_new */
+        PyObject_HEAD_INIT(&PyType_Type) "aclib_shared_memory.Graphics", /* tp_name */
+        sizeof(PyGraphics),                                              /* tp_basicsize */
+        0,                                                               /* tp_itemsize */
+        (destructor)graphics_del_,                                       /* tp_dealloc */
+        0,                                                               /* tp_print */
+        nullptr,                                                         /* tp_getattr */
+        nullptr,                                                         /* tp_setattr */
+        nullptr,                                                         /* tp_reserved */
+        nullptr,                                                         /* tp_repr */
+        nullptr,                                                         /* tp_as_number */
+        nullptr,                                                         /* tp_as_sequence */
+        nullptr,                                                         /* tp_as_mapping */
+        nullptr,                                                         /* tp_hash */
+        nullptr,                                                         /* tp_call */
+        nullptr,                                                         /* tp_str */
+        nullptr,                                                         /* tp_getattro */
+        nullptr,                                                         /* tp_setattro */
+        nullptr,                                                         /* tp_as_buffer */
+        Py_TPFLAGS_DEFAULT,                                              /* tp_flags */
+        nullptr,                                                         /* tp_doc */
+        nullptr,                                                         /* tp_traverse */
+        nullptr,                                                         /* tp_clear */
+        nullptr,                                                         /* tp_richcompare */
+        0,                                                               /* tp_weaklistoffset */
+        nullptr,                                                         /* tp_iter */
+        nullptr,                                                         /* tp_iternext */
+        GraphicsType_methods,                                            /* tp_methods */
+        GraphicsType_members,                                            /* tp_members */
+        GraphicsType_getset,                                             /* tp_getset */
+        nullptr,                                                         /* tp_base */
+        nullptr,                                                         /* tp_dict */
+        nullptr,                                                         /* tp_descr_get */
+        nullptr,                                                         /* tp_descr_set */
+        0,                                                               /* tp_dictoffset */
+        nullptr,                                                         /* tp_init */
+        nullptr,                                                         /* tp_alloc */
+        (newfunc)graphics_new_,                                          /* tp_new */
     };
 }  // namespace ACLIB

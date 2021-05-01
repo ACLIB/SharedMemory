@@ -11,7 +11,7 @@ namespace ACLIB
     struct PyEventLoop
     {
         PyObject_HEAD
-        EventLoop m_event_loop;
+        EventLoop* m_event_loop;
     };
 
     static PyObject* event_loop_new_(PyTypeObject* type, PyObject* args, PyObject* kwds);

@@ -11,7 +11,7 @@ namespace ACLIB
     struct PyGraphics
     {
         PyObject_HEAD
-        SharedMemory<AC::Graphics> m_graphics;
+        SharedMemory<AC::Graphics>* m_graphics;
     };
 
     static PyObject* graphics_new_(PyTypeObject* type, PyObject* args, PyObject* kwds);

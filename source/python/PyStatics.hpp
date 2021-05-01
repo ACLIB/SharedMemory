@@ -10,7 +10,8 @@ namespace ACLIB
 {
     struct PyStatics
     {
-        PyObject_HEAD SharedMemory<AC::Statics> m_statics;
+        PyObject_HEAD
+        SharedMemory<AC::Statics>* m_statics;
     };
 
     static PyObject* statics_new_(PyTypeObject* type, PyObject* args, PyObject* kwds);

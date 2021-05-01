@@ -3,19 +3,15 @@
 
 #include "AC.hpp"
 #include "SharedMemory.hpp"
+#include "util/Thread.hpp"
 
 #include <queue>
 
 namespace ACLIB
 {
-    class EventLoop
+    class EventLoop : public Thread
     {
     private:
-        DWORD  m_thread_id;
-        HANDLE m_thread_handle;
-        bool   m_running;
-        Uint32 m_timeout_ms;
-
         SharedMemory<AC::Physics>  m_physics;
         SharedMemory<AC::Graphics> m_graphics;
         SharedMemory<AC::Statics>  m_statics;
@@ -32,17 +28,14 @@ namespace ACLIB
         void pumpEvent();
         void refreshCompare();
 
-        bool empty() const;
-        size_t size() const;
+        bool      empty() const;
+        size_t    size() const;
         EventType front() const;
-        void pop();
+        void      pop();
+        void      push(EventType event);
 
-        void start();
-        void run();
-        void stop();
+        virtual void run();
     };
-
-    DWORD WINAPI startThread(LPVOID p);
 
 }  // namespace ACLIB
 
