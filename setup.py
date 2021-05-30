@@ -19,6 +19,7 @@ common_lib = Library(
         '../Common/source/util/Thread.cpp'],
     include_dirs=['../Common/include'])
 
+
 extension = Extension(
     name='aclib_shared_memory',
     sources=[
@@ -32,7 +33,8 @@ extension = Extension(
     include_dirs=['source/', '../Common/include'],
     library_dirs=[],
     libraries=['ACLIBCommon'],
-    extra_compile_args=["/Ot"])
+    extra_compile_args=['/Ot'])
+
 
 setup(name='aclib_shared_memory',
       version='1.0',
