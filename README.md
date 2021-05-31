@@ -17,7 +17,7 @@ gr = SM.Graphics()
 st = SM.Statics()
 
 # Registers events in the background (WIP)
-ev = aclib.EventLoop()
+ev = SM.EventLoop()
 
 
 # Get values from memory pages
