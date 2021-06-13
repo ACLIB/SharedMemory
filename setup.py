@@ -24,10 +24,6 @@ extension = Extension(
     name='aclib_shared_memory',
     sources=[
         'source/python/ACLIBSharedMemory.cpp',
-        'source/python/PyEventLoop.cpp',
-        'source/python/PyPhysics.cpp',
-        'source/python/PyGraphics.cpp',
-        'source/python/PyStatics.cpp',
         'source/EventLoop.cpp',
     ],
     include_dirs=['source/', '../Common/include'],
