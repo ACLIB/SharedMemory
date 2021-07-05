@@ -19,45 +19,11 @@ namespace ACLIB
 
         virtual bool init(PyObject* module)
         {
-            // MSVC c99 :/
-            PyMethodDef method_sentinel = {nullptr};
-            PyMemberDef member_sentinel = {nullptr};
-            PyGetSetDef getset_sentinel = {nullptr};
-            m_methods.emplace_back(method_sentinel);
-            m_members.emplace_back(member_sentinel);
-            m_getset.emplace_back(getset_sentinel);
-
-            PyVarObject ob_base = ACLIBPyObject_HEAD_INIT(&PyType_Type);
-            m_type.ob_base      = ob_base;
-            m_type.tp_name      = m_class_name;
             m_type.tp_basicsize = sizeof(PyEventLoop);
-            m_type.tp_flags     = Py_TPFLAGS_DEFAULT;
-            m_type.tp_new       = (newfunc)_new;
-            m_type.tp_dealloc   = (destructor)_del;
-            m_type.tp_init      = (initproc)_init;
-            m_type.tp_methods   = m_methods.data();
-            m_type.tp_members   = m_members.data();
-            m_type.tp_getset    = m_getset.data();
+            m_type.tp_new       = (newfunc)PyEventLoop::_new;
+            m_type.tp_dealloc   = (destructor)PyEventLoop::_del;
 
-            if(module == nullptr)
-            {
-                INFO("Call init() before adding class types.");
-                return false;
-            }
-
-            bool success = true;
-
-            // Init class
-            success &= PyType_Ready(&m_type) >= 0;
-
-            // Add class object
-            success &=
-                PyModule_AddObject(module, m_type.tp_name, reinterpret_cast<PyObject*>(&m_type)) >= 0;
-
-            if(!success)
-                INFO("Could not initialize class.");
-
-            return success;
+            return PyClassType::init(module);
         }
 
         /**
@@ -66,9 +32,7 @@ namespace ACLIB
 
         static PyObject* _new(PyTypeObject* type, PyObject* args, PyObject* kwds)
         {
-            PyEventLoop* self;
-            self = reinterpret_cast<PyEventLoop*>(type->tp_alloc(type, 0));
-
+            auto self = reinterpret_cast<PyEventLoop*>(type->tp_alloc(type, 0));
             if(self != nullptr)
             {
                 self->m_event_loop = new EventLoop();
@@ -76,60 +40,64 @@ namespace ACLIB
             return reinterpret_cast<PyObject*>(self);
         }
 
-        static void _del(PyTypeObject* self)
+        static void _del(PyTypeObject* type)
         {
-            delete reinterpret_cast<PyEventLoop*>(self)->m_event_loop;
-            Py_TYPE(self)->tp_free(self);
+            auto self = reinterpret_cast<PyEventLoop*>(type);
+            if(self != nullptr)
+            {
+                delete self->m_event_loop;
+            }
+            Py_TYPE(type)->tp_free(reinterpret_cast<PyObject*>(type));
         }
 
         /**
          * Custom class type functions
          */
 
-        static PyObject* start(PyEventLoop* type, PyObject* args, PyObject* kwds)
+        static PyObject* start(PyEventLoop* self, PyObject* args, PyObject* kwds)
         {
-            type->m_event_loop->start();
+            self->m_event_loop->start();
             return Py_None;
         }
 
-        static PyObject* stop(PyEventLoop* type, PyObject* args, PyObject* kwds)
+        static PyObject* stop(PyEventLoop* self, PyObject* args, PyObject* kwds)
         {
-            type->m_event_loop->stop();
+            self->m_event_loop->stop();
             return Py_None;
         }
 
-        static PyObject* size(PyEventLoop* type, PyObject* args, PyObject* kwds)
+        static PyObject* size(PyEventLoop* self, PyObject* args, PyObject* kwds)
         {
-            return PyLong_FromLong(type->m_event_loop->size());
+            return PyLong_FromLong(self->m_event_loop->size());
         }
 
-        static PyObject* empty(PyEventLoop* type, PyObject* args, PyObject* kwds)
+        static PyObject* empty(PyEventLoop* self, PyObject* args, PyObject* kwds)
         {
-            return PyBool_FromLong(type->m_event_loop->empty());
+            return PyBool_FromLong(self->m_event_loop->empty());
         }
 
-        static PyObject* front(PyEventLoop* type, PyObject* args, PyObject* kwds)
+        static PyObject* front(PyEventLoop* self, PyObject* args, PyObject* kwds)
         {
-            if(!type->m_event_loop->empty())
+            if(!self->m_event_loop->empty())
             {
-                return PyLong_FromLong(type->m_event_loop->front());
+                return PyLong_FromLong(self->m_event_loop->front());
             }
             else
                 return Py_None;
         }
 
-        static PyObject* pop(PyEventLoop* type, PyObject* args, PyObject* kwds)
+        static PyObject* pop(PyEventLoop* self, PyObject* args, PyObject* kwds)
         {
-            if(!type->m_event_loop->empty())
+            if(!self->m_event_loop->empty())
             {
-                auto event = type->m_event_loop->front();
-                type->m_event_loop->pop();
+                auto event = self->m_event_loop->front();
+                self->m_event_loop->pop();
                 return PyLong_FromLong(event);
             }
             return Py_None;
         }
 
-        static PyObject* push(PyEventLoop* type, PyObject* args, PyObject* kwds)
+        static PyObject* push(PyEventLoop* self, PyObject* args, PyObject* kwds)
         {
             long event;
 
@@ -144,7 +112,7 @@ namespace ACLIB
                 return nullptr;
             }
 
-            type->m_event_loop->push(event);
+            self->m_event_loop->push(event);
 
             return Py_None;
         }

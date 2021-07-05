@@ -19,45 +19,11 @@ namespace ACLIB
 
         virtual bool init(PyObject* module)
         {
-            // MSVC c99 :/
-            PyMethodDef method_sentinel = {nullptr};
-            PyMemberDef member_sentinel = {nullptr};
-            PyGetSetDef getset_sentinel = {nullptr};
-            m_methods.emplace_back(method_sentinel);
-            m_members.emplace_back(member_sentinel);
-            m_getset.emplace_back(getset_sentinel);
-
-            PyVarObject ob_base = ACLIBPyObject_HEAD_INIT(&PyType_Type);
-            m_type.ob_base      = ob_base;
-            m_type.tp_name      = m_class_name;
             m_type.tp_basicsize = sizeof(PyGraphics);
-            m_type.tp_flags     = Py_TPFLAGS_DEFAULT;
-            m_type.tp_new       = (newfunc)_new;
-            m_type.tp_dealloc   = (destructor)_del;
-            m_type.tp_init      = (initproc)_init;
-            m_type.tp_methods   = m_methods.data();
-            m_type.tp_members   = m_members.data();
-            m_type.tp_getset    = m_getset.data();
+            m_type.tp_new       = (newfunc)PyGraphics::_new;
+            m_type.tp_dealloc   = (destructor)PyGraphics::_del;
 
-            if(module == nullptr)
-            {
-                INFO("Call init() before adding class types.");
-                return false;
-            }
-
-            bool success = true;
-
-            // Init class
-            success &= PyType_Ready(&m_type) >= 0;
-
-            // Add class object
-            success &=
-                PyModule_AddObject(module, m_type.tp_name, reinterpret_cast<PyObject*>(&m_type)) >= 0;
-
-            if(!success)
-                INFO("Could not initialize class.");
-
-            return success;
+            return PyClassType::init(module);
         }
 
         /**
@@ -66,9 +32,7 @@ namespace ACLIB
 
         static PyObject* _new(PyTypeObject* type, PyObject* args, PyObject* kwds)
         {
-            PyGraphics* self;
-            self = reinterpret_cast<PyGraphics*>(type->tp_alloc(type, 0));
-
+            auto self = reinterpret_cast<PyGraphics*>(type->tp_alloc(type, 0));
             if(self != nullptr)
             {
                 self->m_graphics = new SharedMemory<AC::Graphics>(AC::GRAPHICS_PAGE);
@@ -76,10 +40,14 @@ namespace ACLIB
             return reinterpret_cast<PyObject*>(self);
         }
 
-        static void _del(PyTypeObject* self)
+        static void _del(PyTypeObject* type)
         {
-            delete reinterpret_cast<PyGraphics*>(self)->m_graphics;
-            self->tp_free(self);
+            auto self = reinterpret_cast<PyGraphics*>(type);
+            if(self != nullptr)
+            {
+                delete self->m_graphics;
+            }
+            Py_TYPE(type)->tp_free(reinterpret_cast<PyObject*>(type));
         }
 
         /**

@@ -25,6 +25,13 @@ namespace ACLIB
 
         std::queue<EventType> m_events;
 
+        template<typename T>
+        void compare(T t1, T t2, EVENT event)
+        {
+            if(t1 != t2)
+                m_events.emplace(event);
+        }
+
         void pumpEvent();
         void refreshCompare();
 

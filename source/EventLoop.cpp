@@ -16,32 +16,22 @@ namespace ACLIB
     void EventLoop::pumpEvent()
     {
         // Physics
-        if(m_physics->gear != m_physics_compare.gear)
-        {
-            m_events.emplace(GEAR_CHANGED);
-        }
+        compare(m_physics->gear, m_physics_compare.gear, GEAR_CHANGED);
+        compare(m_physics->carDamage, m_physics_compare.carDamage, DAMAGE_CHANGED);
+        compare(m_physics->numberOfTyresOut, m_physics_compare.numberOfTyresOut, TYRES_OUT_CHANGED);
+        compare(m_physics->drs, m_physics_compare.drs, DRS_CHANGED);
+        compare(m_physics->drsAvailable, m_physics_compare.drsAvailable, DRS_AVAILABLE_CHANGED);
+        compare(m_physics->drsEnabled, m_physics_compare.drsEnabled, DRS_ENABLE_CHANGED);
 
         // Graphics
-        if(m_graphics->status != m_graphics_compare.status)
-        {
-            m_events.emplace(STATUS_CHANGED);
-        }
-        if(m_graphics->session != m_graphics_compare.session)
-        {
-            m_events.emplace(SESSION_CHANGED);
-        }
-        if(m_graphics->completedLaps != m_graphics_compare.completedLaps)
-        {
-            m_events.emplace(COMPLETED_LAPS_CHANGED);
-        }
-        if(m_graphics->position != m_graphics_compare.position)
-        {
-            m_events.emplace(POSITION_CHANGED);
-        }
-        if(m_graphics->isInPit != m_graphics_compare.isInPit)
-        {
-            m_events.emplace(IS_IN_PIT);
-        }
+        compare(m_graphics->status, m_graphics_compare.status, STATUS_CHANGED);
+        compare(m_graphics->session, m_graphics_compare.session, SESSION_CHANGED);
+        compare(m_graphics->completedLaps, m_graphics_compare.completedLaps, COMPLETED_LAPS_CHANGED);
+        compare(m_graphics->position, m_graphics_compare.position, POSITION_CHANGED);
+        compare(m_graphics->isInPit, m_graphics_compare.isInPit, IS_IN_PIT);
+        compare(m_graphics->tyreCompound, m_graphics_compare.tyreCompound, TYRE_CHANGED);
+        compare(m_graphics->penaltyTime, m_graphics_compare.penaltyTime, PENALTY_CHANGED);
+        compare(m_graphics->flag, m_graphics_compare.flag, FLAG_CHANGED);
     }
 
     void EventLoop::refreshCompare()

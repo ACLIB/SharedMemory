@@ -54,6 +54,7 @@ namespace ACLIB
 
         ~SharedMemory()
         {
+            UnmapViewOfFile(m_data);
             CloseHandle(m_handle);
         }
     };
